@@ -45,7 +45,7 @@ public class ScheduleGThreadLinked extends GShedule{
     private int mSheduleLinkState;
     
     public ScheduleGThreadLinked(int workers, GThread... gThread){
-        super(workers, gThread);
+        super(workers);
         init(gThread);
     }
     
@@ -159,6 +159,18 @@ public class ScheduleGThreadLinked extends GShedule{
     
     public int state(){
         return mSheduleLinkState;
+    }
+
+    @Override
+    protected void checkGThreadValidation() throws ScheduleGThreadException {
+        for(GThread gThread : mQueueLinkedList.toArray(new GThread[mQueueLinkedList.size()])){
+            switch(gThread.gthreadState()){
+                case GThread.G_THREAD_RUNNING:
+                    throw new ScheduleGThreadException(ScheduleGThreadException.ALIVE_THREAD_EXCEPTION_MESSAGE);
+                case GThread.G_THREAD_TERMINATED:
+                    throw new ScheduleGThreadException(ScheduleGThreadException.TERMINATED_THREAD_EXCEPTION_MESSAGE);
+            }
+        }
     }
     
 }

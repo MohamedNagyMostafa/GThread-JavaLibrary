@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 
 public abstract class ScheduleGThread extends GShedule{
     /**
-     * ScheduleGThread constructor inwhich initialize an initial state of
+     * ScheduleGThread constructor in which initialize an initial state of
      * schedule.
      * 
      * @param <T>
@@ -66,6 +66,7 @@ public abstract class ScheduleGThread extends GShedule{
             for (GThread gThread : M_GTHREADS_ARRAY) {
                 identifyGThread(gThread);
                 gThread.start();
+                
                 updateWorkers(INCREASE_ONE_WORKER_FROM_WORKERS);
                 while(mCurrentWorker >= M_WORKERS_LIMIT);
             }
@@ -101,6 +102,18 @@ public abstract class ScheduleGThread extends GShedule{
           }
       }
       onScheduleFinished();
+    }
+
+    @Override
+    protected void checkGThreadValidation() throws ScheduleGThreadException {
+        for(GThread gThread : M_GTHREADS_ARRAY){
+            switch(gThread.gthreadState()){
+                case GThread.G_THREAD_RUNNING:
+                    throw new ScheduleGThreadException(ScheduleGThreadException.ALIVE_THREAD_EXCEPTION_MESSAGE);
+                case GThread.G_THREAD_TERMINATED:
+                    throw new ScheduleGThreadException(ScheduleGThreadException.TERMINATED_THREAD_EXCEPTION_MESSAGE);
+            }
+        }
     }
     
     /**

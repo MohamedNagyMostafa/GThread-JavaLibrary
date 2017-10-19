@@ -26,7 +26,7 @@ public abstract class GShedule {
     // Increase only one worker from the current workers.
     protected static final int INCREASE_ONE_WORKER_FROM_WORKERS = 1;
     // Array of gthread which must have excuted as schedule way.
-    protected final GThread[] M_GTHREADS_ARRAY;
+    protected GThread[] M_GTHREADS_ARRAY;
     // Limitation number of workers which execute schedule tasks
     // at the same time.
     protected final int M_WORKERS_LIMIT;
@@ -41,22 +41,10 @@ public abstract class GShedule {
         mCurrentWorker = 0;
     }
     
-    /**
-     * To sure there's no terminated gthread or running gthread is
-     * Attached to schedule before running.
-     * @throws ScheduleGThreadException 
-     */
-    protected void checkGThreadValidation() throws ScheduleGThreadException{
-        for(GThread gThread : M_GTHREADS_ARRAY){
-            switch(gThread.gthreadState()){
-                case GThread.G_THREAD_RUNNING:
-                    throw new ScheduleGThreadException(ScheduleGThreadException.ALIVE_THREAD_EXCEPTION_MESSAGE);
-                case GThread.G_THREAD_TERMINATED:
-                    throw new ScheduleGThreadException(ScheduleGThreadException.TERMINATED_THREAD_EXCEPTION_MESSAGE);
-            }
-        }
+    protected GShedule(int workers){
+        M_WORKERS_LIMIT = workers;
+        mCurrentWorker = 0;
     }
-    
     /**
      * Synchronize process inwhich workers increase when
      * new task is avaliable and decrease when task is terminated.
@@ -74,4 +62,11 @@ public abstract class GShedule {
      *                                  contain threads which run before or is terminated
      */
     public abstract int start() throws ScheduleGThreadException;
+    /**
+     * To sure there's no terminated gthread or running gthread is
+     * Attached to schedule before running.
+     * @throws ScheduleGThreadException 
+     */
+    protected abstract void checkGThreadValidation() throws ScheduleGThreadException;
+    
 }
