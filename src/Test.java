@@ -49,19 +49,10 @@ public class Test {
         Util.println("Go Sleep");
         Thread.sleep(5000);
         Util.println("Wake up and pause");
-        scheduleGThreadLinked.pause();
+        scheduleGThreadLinked.stop();
         Util.println("Go Sleep");
         Thread.sleep(8000);
         Util.println("Wake up and start");
         scheduleGThreadLinked.start();
-        Util.println("Go Sleep");
-        Thread.sleep(2000);
-        Util.println("Wake up pause");
-        scheduleGThreadLinked.pause();
-        Util.println("Go Sleep");
-        Thread.sleep(8000);
-        Util.println("Wake up start");
-        scheduleGThreadLinked.start();
-
     }
 }
