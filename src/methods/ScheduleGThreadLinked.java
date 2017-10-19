@@ -35,9 +35,11 @@ import java.util.logging.Logger;
 public class ScheduleGThreadLinked extends GShedule{
     public static final int SCHEDULE_LINK_ACCEPT_RESPONSE  = 1;
     public static final int SCHEDULE_LINK_REJECT_RESPONSE = -1;
-    public static final int SCHEDULE_LINK_TASKS_FINISHED = 4;
+    
     public static final int SCHEDULE_LINK_TASKS_RUNNING = 2;
     public static final int SCHEDULE_LINK_TASKS_IDLE = 3;
+    public static final int SCHEDULE_LINK_TASKS_FINISHED = 4;
+    public static final int SCHEDULE_LINK_TASKS_PAUSED = 5;
     
     private GQueueLinkedList<GThread> mQueueLinkedList;
     private int mSheduleLinkState;
@@ -65,12 +67,14 @@ public class ScheduleGThreadLinked extends GShedule{
         
         mScheduleGThread = new Thread(() -> {
             
-            while(mQueueLinkedList.hasNext(mQueueLinkedList.iterator())){
+            while(mQueueLinkedList.hasNext(mQueueLinkedList.iterator()) && 
+                    mSheduleLinkState != SCHEDULE_LINK_TASKS_PAUSED){
                 gthreadHandling();
                 updateWorkers(INCREASE_ONE_WORKER_FROM_WORKERS);
                 while(mCurrentWorker >= M_WORKERS_LIMIT);
             }
-            mSheduleLinkState = SCHEDULE_LINK_TASKS_FINISHED;            
+            mSheduleLinkState = (mSheduleLinkState == SCHEDULE_LINK_TASKS_PAUSED)? 
+                    SCHEDULE_LINK_TASKS_PAUSED : SCHEDULE_LINK_TASKS_FINISHED;            
         });
         mScheduleGThread.start();
         
@@ -137,4 +141,24 @@ public class ScheduleGThreadLinked extends GShedule{
         gThread.setScheduleGThreadLinked(this,gThread);
         gThread.start();
     }
+    
+    public int pause(){
+        if(mQueueLinkedList.isEmpty() || mCurrentWorker != SCHEDULE_LINK_TASKS_RUNNING)
+            return SCHEDULE_LINK_REJECT_RESPONSE;
+        else{
+            mSheduleLinkState = SCHEDULE_LINK_TASKS_PAUSED;
+            return SCHEDULE_LINK_ACCEPT_RESPONSE;
+        }
+    }
+    
+    public int stop(){
+        int remainsGThread = mQueueLinkedList.size();
+        mQueueLinkedList.clear();
+        return remainsGThread;
+    }
+    
+    public int state(){
+        return mSheduleLinkState;
+    }
+    
 }
