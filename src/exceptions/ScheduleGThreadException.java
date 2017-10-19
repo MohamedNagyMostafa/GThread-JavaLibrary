@@ -1,3 +1,5 @@
+package exceptions;
+
 /*
  * Copyright [2017] Mohamed Nagy Mostafa Mohamed
  *

@@ -1,7 +1,4 @@
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+package methods;
 /*
  * Copyright [2017] Mohamed Nagy Mostafa Mohamed
  *
@@ -17,17 +14,29 @@ import java.util.logging.Logger;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * GThread Class advanced version for threads, You can handle with upcoming object 
+ * which come after thread processes are done on object.
+ * 
+ * @author mohamednagy
+ * @param <T>   Type of object which you're going to get back after GThread done
+ *              it's work completely
+ */
+import handlers.GShedule;
+import exceptions.ScheduleGThreadException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-
-public abstract class ScheduleGThread<T> extends GShedule<T>{
+public abstract class ScheduleGThread extends GShedule{
     /**
      * ScheduleGThread constructor inwhich initialize an initial state of
      * schedule.
      * 
+     * @param <T>
      * @param workers   Number of workers who are going to execute tasks
      * @param gThread   List of gthreads which must have execute as schedule way
      */
-    public ScheduleGThread(int workers, GThread<T>... gThread){
+    public <T>ScheduleGThread(int workers, GThread... gThread){
         super(workers, gThread);
         init();
     }
@@ -54,7 +63,7 @@ public abstract class ScheduleGThread<T> extends GShedule<T>{
         }
 
         mScheduleGThread = new Thread(() -> {
-            for (GThread<T> gThread : M_GTHREADS_ARRAY) {
+            for (GThread gThread : M_GTHREADS_ARRAY) {
                 identifyGThread(gThread);
                 gThread.start();
                 updateWorkers(INCREASE_ONE_WORKER_FROM_WORKERS);
@@ -77,14 +86,14 @@ public abstract class ScheduleGThread<T> extends GShedule<T>{
      * Set schedule as a parent to specific gthread.
      * @param gThread   Tasks which are going to execute in schedule
      */
-    private void identifyGThread(GThread<T> gThread){
+    private void identifyGThread(GThread gThread){
         gThread.setScheduleGThread(this);
    }
     /**
      * insure that there's no task is work.
      */
     private void allTasksExceuted(){
-      for(GThread<T> gThread : M_GTHREADS_ARRAY){
+      for(GThread gThread : M_GTHREADS_ARRAY){
           try {
               gThread.join();
           } catch (InterruptedException ex) {

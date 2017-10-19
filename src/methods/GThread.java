@@ -1,29 +1,7 @@
+package methods;
 
-import com.sun.org.apache.xalan.internal.xsltc.compiler.util.Util;
+import handlers.GThreadActors;
 
-/*
- * Copyright [2017] Mohamed Nagy Mostafa Mohamed
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-/**
- * GThread Class advanced version for threads, You can handle with upcoming object 
- * which come after thread processes are done on object.
- * 
- * @author mohamednagy
- * @param <T>   Type of object which you're going to get back after GThread done
- *              it's work completely
- */
 public abstract class GThread<T> extends GThreadController implements GThreadActors<T>{
     
     // The value of GThread name when it's not have specific name.

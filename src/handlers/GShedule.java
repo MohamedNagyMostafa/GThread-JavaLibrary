@@ -1,3 +1,9 @@
+package handlers;
+
+
+import exceptions.ScheduleGThreadException;
+import methods.GThread;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -8,7 +14,7 @@
  *
  * @author mohamednagy
  */
-public abstract class GShedule<T> {
+public abstract class GShedule {
     // Starting Schedule state value when schedule start successfuly.
     public static final int G_SCHEDULE_START_SUCCESSFULLY = 1;
     // Starting Schedule state value when schedule failed to start.
@@ -20,7 +26,7 @@ public abstract class GShedule<T> {
     // Increase only one worker from the current workers.
     protected static final int INCREASE_ONE_WORKER_FROM_WORKERS = 1;
     // Array of gthread which must have excuted as schedule way.
-    protected final GThread<T>[] M_GTHREADS_ARRAY;
+    protected final GThread[] M_GTHREADS_ARRAY;
     // Limitation number of workers which execute schedule tasks
     // at the same time.
     protected final int M_WORKERS_LIMIT;
@@ -29,7 +35,7 @@ public abstract class GShedule<T> {
     // Number of current workers which execute tasks.
     protected int mCurrentWorker;
     
-    protected GShedule(int workers, GThread<T>... gThread){
+    protected GShedule(int workers, GThread... gThread){
         M_WORKERS_LIMIT = workers;
         M_GTHREADS_ARRAY = gThread;
         mCurrentWorker = 0;
@@ -41,7 +47,7 @@ public abstract class GShedule<T> {
      * @throws ScheduleGThreadException 
      */
     protected void checkGThreadValidation() throws ScheduleGThreadException{
-        for(GThread<T> gThread : M_GTHREADS_ARRAY){
+        for(GThread gThread : M_GTHREADS_ARRAY){
             switch(gThread.gthreadState()){
                 case GThread.G_THREAD_RUNNING:
                     throw new ScheduleGThreadException(ScheduleGThreadException.ALIVE_THREAD_EXCEPTION_MESSAGE);
@@ -67,5 +73,5 @@ public abstract class GShedule<T> {
      * @throws ScheduleGThreadException Exception throws when the list of gthreads
      *                                  contain threads which run before or is terminated
      */
-    protected abstract int start() throws ScheduleGThreadException;
+    public abstract int start() throws ScheduleGThreadException;
 }

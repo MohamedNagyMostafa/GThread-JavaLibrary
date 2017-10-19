@@ -1,7 +1,4 @@
-
-import com.sun.org.apache.xalan.internal.xsltc.compiler.util.Util;
-import jdk.nashorn.internal.parser.TokenType;
-
+package methods;
 /*
  * Copyright [2017] Mohamed Nagy Mostafa Mohamed
  *
@@ -17,31 +14,34 @@ import jdk.nashorn.internal.parser.TokenType;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * Handle with connection between Gthread objects and their containers.
+ * @author mohamednagy
+ * @param <T> Type of returning object in Gthread.
+ */
+public abstract class GThreadController{
 
-public abstract class GThreadController<T>{
-    
     protected static final int G_THREAD_WITHOUT_SCHEDULE = 1;
     protected static final int G_THREAD_WITH_SCHEDULE = 2;
     protected static final int G_THREAD_WITH_LINKED_SCHEDULE = 3;
     
-    private ScheduleGThread<T> mScheduleGThread;
-    private ScheduleGThreadLinked<T> mScheduleGThreadLinked;
-    private GThread<T> mGThread;
+    private ScheduleGThread mScheduleGThread;
+    private ScheduleGThreadLinked mScheduleGThreadLinked;
+    private GThread mGThread;
     
     protected void notifyChanging(){
         if(mScheduleGThread != null){
             mScheduleGThread.onItemFinished();
-
         }else{
             mScheduleGThreadLinked.onItemFinished(mGThread);
         }
     }
     
-    protected void setScheduleGThread(ScheduleGThread<T> scheduleGThread){
+    protected void setScheduleGThread(ScheduleGThread scheduleGThread){
         mScheduleGThread = scheduleGThread;
     }
     
-    protected void setScheduleGThreadLinked(ScheduleGThreadLinked<T> scheduleGThreadLinked, GThread<T> gThread){
+    protected void setScheduleGThreadLinked(ScheduleGThreadLinked scheduleGThreadLinked, GThread gThread){
         mScheduleGThreadLinked = scheduleGThreadLinked;
         mGThread = gThread;
     }
