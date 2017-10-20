@@ -116,7 +116,7 @@ public class ScheduleGThreadLinked extends GShedule{
      * Called when each one of tasks is terminated.
      * @param gthreadID 
      */
-    public void onItemFinished(GThread gThread){
+    void onItemFinished(GThread gThread){
         mQueueLinkedList.remove(gThread);
         updateWorkers(DECREASE_ONE_WORKER_FROM_WORKERS);        
     }

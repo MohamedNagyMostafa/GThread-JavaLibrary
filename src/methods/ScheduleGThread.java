@@ -80,7 +80,7 @@ public abstract class ScheduleGThread extends GShedule{
     /**
      * Called when each one of tasks is terminated.
      */
-    public void onItemFinished(){
+    void onItemFinished(){
         updateWorkers(DECREASE_ONE_WORKER_FROM_WORKERS);        
     }
     /**
@@ -119,5 +119,5 @@ public abstract class ScheduleGThread extends GShedule{
     /**
      * Called when schedule tasks are finished completely.
      */
-    public abstract void onScheduleFinished();
+    abstract void onScheduleFinished();
 }
