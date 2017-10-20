@@ -119,5 +119,5 @@ public abstract class ScheduleGThread extends GShedule{
     /**
      * Called when schedule tasks are finished completely.
      */
-    abstract void onScheduleFinished();
+    public abstract void onScheduleFinished();
 }
