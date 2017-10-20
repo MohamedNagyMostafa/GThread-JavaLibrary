@@ -103,7 +103,7 @@
 						<h3>Methods</h3>
 						<ul>
 							<li>
-								<b>start()</b>: Returns 1 if ScheduleGThread is started successfully otherwise returns -1. (We are going to talk about this point in details later)
+								<b>start()</b>: Returns <b>ScheduleGThreadLinked.SCHEDULE_LINK_ACCEPT_RESPONSE</b> if ScheduleGThread is started successfully otherwise returns <b>ScheduleGThreadLinked.SCHEDULE_LINK_REJECT_RESPONSE</b>. (We are going to talk about this point in details later)
 							</li>
 						</ul>
 					</li>
