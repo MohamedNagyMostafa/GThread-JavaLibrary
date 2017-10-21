@@ -1,6 +1,7 @@
-package handlers;
+package methods;
 
 
+import com.sun.org.apache.xalan.internal.xsltc.compiler.util.Util;
 import exceptions.ScheduleGThreadException;
 import methods.GThread;
 
@@ -14,7 +15,7 @@ import methods.GThread;
  *
  * @author mohamednagy
  */
-public abstract class GShedule {
+abstract class GShedule {
     // Starting Schedule state value when schedule start successfuly.
     public static final int G_SCHEDULE_START_SUCCESSFULLY = 1;
     // Starting Schedule state value when schedule failed to start.
@@ -33,7 +34,9 @@ public abstract class GShedule {
     // Original thread of Schedule gthread.
     protected Thread mScheduleGThread; 
     // Number of current workers which execute tasks.
-    protected int mCurrentWorker;
+    protected Integer mCurrentWorker;
+    protected Integer mSheduleLinkState;
+
     
     protected GShedule(int workers, GThread... gThread){
         M_WORKERS_LIMIT = workers;
@@ -52,6 +55,7 @@ public abstract class GShedule {
      */
     protected synchronized void updateWorkers(int workersChanger){
        mCurrentWorker += workersChanger; 
+       notify();
     }
     
    
@@ -68,5 +72,4 @@ public abstract class GShedule {
      * @throws ScheduleGThreadException 
      */
     protected abstract void checkGThreadValidation() throws ScheduleGThreadException;
-    
 }

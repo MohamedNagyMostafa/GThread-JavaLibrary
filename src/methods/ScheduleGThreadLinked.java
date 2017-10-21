@@ -22,9 +22,9 @@ package methods;
  * @param <T>   Type of object which you're going to get back after GThread done
  *              it's work completely
  */
-import handlers.GQueueLinkedList;
-import handlers.GShedule;
+import com.sun.org.apache.xalan.internal.xsltc.compiler.util.Util;
 import exceptions.ScheduleGThreadException;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,7 +42,6 @@ public class ScheduleGThreadLinked extends GShedule{
     public static final int SCHEDULE_LINK_TASKS_PAUSED = 5;
     
     private GQueueLinkedList<GThread> mQueueLinkedList;
-    private int mSheduleLinkState;
     
     public ScheduleGThreadLinked(int workers, GThread... gThread){
         super(workers);
@@ -56,8 +55,10 @@ public class ScheduleGThreadLinked extends GShedule{
     }
 
     @Override
-    public int start() {
-        mSheduleLinkState = SCHEDULE_LINK_TASKS_RUNNING;
+    public synchronized int start() {
+        // Ensure there's no previous schedule in running mode.
+        checkAccessing();
+                
         try {
             checkGThreadValidation();
         } catch (ScheduleGThreadException ex) {
@@ -65,23 +66,12 @@ public class ScheduleGThreadLinked extends GShedule{
             return GShedule.G_SCHEDULE_START_FAILED;
         }
         
-        mScheduleGThread = new Thread(() -> {
-            
-            while(mQueueLinkedList.hasNext(mQueueLinkedList.iterator()) && 
-                    mSheduleLinkState != SCHEDULE_LINK_TASKS_PAUSED){
-                gthreadHandling();
-                updateWorkers(INCREASE_ONE_WORKER_FROM_WORKERS);
-                while(mCurrentWorker >= M_WORKERS_LIMIT);
-            }
-            mSheduleLinkState = (mSheduleLinkState == SCHEDULE_LINK_TASKS_PAUSED)? 
-                    SCHEDULE_LINK_TASKS_PAUSED : SCHEDULE_LINK_TASKS_FINISHED;            
-        });
-        mScheduleGThread.start();
-        
+        startScheduleProgress();
+       
         return GShedule.G_SCHEDULE_START_SUCCESSFULLY;
     }
     
-    public int add(GThread gThread){
+    public synchronized int add(GThread gThread){
         try {
             checkGThreadValidationAt(gThread);
             mQueueLinkedList.add(gThread);
@@ -93,7 +83,7 @@ public class ScheduleGThreadLinked extends GShedule{
         return SCHEDULE_LINK_ACCEPT_RESPONSE;
     }
     
-    public int remove(GThread gThread){
+    public synchronized int remove(GThread gThread){
         if(mQueueLinkedList.contains(gThread)){
             if(!gThread.isAlive()){
                 mQueueLinkedList.remove(gThread);
@@ -109,16 +99,15 @@ public class ScheduleGThreadLinked extends GShedule{
     
     private void checkAddingGThread(GThread gThread){
         if(mSheduleLinkState == SCHEDULE_LINK_TASKS_FINISHED && !gThread.isAlive()){
-                start();                
+                start();
         }
     }
     /**
      * Called when each one of tasks is terminated.
      * @param gthreadID 
      */
-    void onItemFinished(GThread gThread){
-        mQueueLinkedList.remove(gThread);
-        updateWorkers(DECREASE_ONE_WORKER_FROM_WORKERS);        
+    synchronized void onItemFinished(GThread gThread){
+        updateWorkers(DECREASE_ONE_WORKER_FROM_WORKERS);    
     }
 
     private void checkGThreadValidationAt(GThread gThread) throws ScheduleGThreadException {
@@ -131,29 +120,39 @@ public class ScheduleGThreadLinked extends GShedule{
     }
     
     private void identifyGThreads(GThread... gThreads){
-        for(GThread gThread : gThreads){
-            mQueueLinkedList.add(gThread);
-        }
+        mQueueLinkedList.addAll(Arrays.asList(gThreads));
     }
     
-    private void gthreadHandling(){
+    private GThread gthreadHandling(){
         GThread gThread = mQueueLinkedList.poll();
         gThread.setScheduleGThreadLinked(this,gThread);
         gThread.start();
+        return gThread;
     }
     
     public int pause(){
-        if(mQueueLinkedList.isEmpty() || mCurrentWorker != SCHEDULE_LINK_TASKS_RUNNING)
+        if(mQueueLinkedList.isEmpty() || mSheduleLinkState == SCHEDULE_LINK_TASKS_FINISHED){
             return SCHEDULE_LINK_REJECT_RESPONSE;
-        else{
+        }else{
             mSheduleLinkState = SCHEDULE_LINK_TASKS_PAUSED;
             return SCHEDULE_LINK_ACCEPT_RESPONSE;
+        }
+    }
+    
+    public synchronized int resume(){
+        if(mSheduleLinkState == SCHEDULE_LINK_TASKS_PAUSED){
+            mSheduleLinkState = SCHEDULE_LINK_TASKS_RUNNING;
+            notify();
+            return SCHEDULE_LINK_ACCEPT_RESPONSE;
+        }else{
+            return SCHEDULE_LINK_REJECT_RESPONSE;
         }
     }
     
     public int stop(){
         int remainsGThread = mQueueLinkedList.size();
         mQueueLinkedList.clear();
+        mSheduleLinkState = SCHEDULE_LINK_TASKS_FINISHED;
         return remainsGThread;
     }
     
@@ -172,5 +171,55 @@ public class ScheduleGThreadLinked extends GShedule{
             }
         }
     }
+    /**
+     * Waiting if this is the last gthread till its progress is 
+     * completed completely or new gthread is inserted.
+     * @param gthread 
+     */
+    private void waitingLastGThread(GThread gthread){
+        do{
+            if(!mQueueLinkedList.isEmpty())
+                break;
+        } while(gthread.gthreadState() == GThread.G_THREAD_RUNNING); 
+    }
     
+    private synchronized void waitingWorkers(){
+        while(mCurrentWorker == M_WORKERS_LIMIT){
+            try {
+                wait();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(ScheduleGThreadLinked.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } 
+    }
+    
+    private synchronized void waitingPause(){
+        while (mSheduleLinkState == SCHEDULE_LINK_TASKS_PAUSED){
+            try {
+                wait();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(ScheduleGThreadLinked.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+    
+    private void startScheduleProgress(){
+        mScheduleGThread = new Thread(() -> {
+            mSheduleLinkState = SCHEDULE_LINK_TASKS_RUNNING;
+            while(mQueueLinkedList.hasNext(mQueueLinkedList.iterator())){
+                waitingWorkers();
+                waitingPause();
+                updateWorkers(INCREASE_ONE_WORKER_FROM_WORKERS);
+                GThread gthread = gthreadHandling();
+                waitingLastGThread(gthread);
+            }
+            mSheduleLinkState = SCHEDULE_LINK_TASKS_FINISHED;
+        });
+        mScheduleGThread.start();
+    }
+    
+    private void checkAccessing(){
+        if(mScheduleGThread != null && mScheduleGThread.isAlive())
+            mScheduleGThread.interrupt();
+    }
 }

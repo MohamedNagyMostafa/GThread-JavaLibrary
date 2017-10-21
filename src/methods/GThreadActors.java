@@ -1,4 +1,4 @@
-package handlers;
+package methods;
 
 /*
  * Copyright [2017] Mohamed Nagy Mostafa Mohamed
@@ -16,7 +16,7 @@ package handlers;
  * limitations under the License.
  */
 
-public interface GThreadActors<T> {
+interface GThreadActors<T> {
     
     /**
      * Called start method in GThread is called, It contains the GThread

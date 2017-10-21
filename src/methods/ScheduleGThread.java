@@ -22,7 +22,6 @@ package methods;
  * @param <T>   Type of object which you're going to get back after GThread done
  *              it's work completely
  */
-import handlers.GShedule;
 import exceptions.ScheduleGThreadException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
