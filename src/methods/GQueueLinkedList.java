@@ -1,9 +1,8 @@
-package handlers;
+package methods;
 
 
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Queue;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -15,7 +14,7 @@ import java.util.Queue;
  *
  * @author mohamednagy
  */
-public class GQueueLinkedList<GThread> extends LinkedList<GThread> {
+class GQueueLinkedList<GThread> extends LinkedList<GThread> {
     private static final int ADD_ITEM_PROCESS = 1;
     private static final int REMOVE_ITEM_PROCESS = 2;
     private static final int CHECK_QUEUE_ITEMS = 3;

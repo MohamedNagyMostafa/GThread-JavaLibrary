@@ -19,7 +19,7 @@ package methods;
  * @author mohamednagy
  * @param <T> Type of returning object in Gthread.
  */
-public abstract class GThreadController{
+abstract class GThreadController{
 
     protected static final int G_THREAD_WITHOUT_SCHEDULE = 1;
     protected static final int G_THREAD_WITH_SCHEDULE = 2;

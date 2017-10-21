@@ -1,7 +1,5 @@
 package methods;
 
-import handlers.GThreadActors;
-
 public abstract class GThread<T> extends GThreadController implements GThreadActors<T>{
     
     // The value of GThread name when it's not have specific name.

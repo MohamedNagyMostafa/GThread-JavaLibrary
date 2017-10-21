@@ -42,11 +42,13 @@ public class Testing {
             ScheduleGThreadLinked scheduleGThreadLinked = new ScheduleGThreadLinked(2, gs[0],gs[1],gs[2], gs[3]);
             scheduleGThreadLinked.start();
             Thread.sleep(5500);
+            Util.println("pause");
             scheduleGThreadLinked.pause();
-            Util.println("pause done");
-            Thread.sleep(10000);
+            Thread.sleep(6000);
+            Util.println("resume");
             scheduleGThreadLinked.resume();
-           
+            Util.println("add");
+            scheduleGThreadLinked.add(gs[4]);
            
         } catch (InterruptedException ex) {
         }
