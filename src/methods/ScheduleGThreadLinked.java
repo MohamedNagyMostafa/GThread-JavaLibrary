@@ -22,7 +22,6 @@ package methods;
  * @param <T>   Type of object which you're going to get back after GThread done
  *              it's work completely
  */
-import com.sun.org.apache.xalan.internal.xsltc.compiler.util.Util;
 import exceptions.ScheduleGThreadException;
 import java.util.Arrays;
 import java.util.logging.Level;
@@ -42,6 +41,7 @@ public class ScheduleGThreadLinked extends GShedule{
     public static final int SCHEDULE_LINK_TASKS_PAUSED = 5;
     
     private GQueueLinkedList<GThread> mQueueLinkedList;
+    private Integer mSheduleLinkState;
     
     public ScheduleGThreadLinked(int workers, GThread... gThread){
         super(workers);

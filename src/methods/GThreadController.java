@@ -20,15 +20,20 @@ package methods;
  * @param <T> Type of returning object in Gthread.
  */
 abstract class GThreadController{
-
+    // Type of GThread donate to there's not any schedule is existed.
     protected static final int G_THREAD_WITHOUT_SCHEDULE = 1;
+    // Type of GThread donate to there's schedule is existed.
     protected static final int G_THREAD_WITH_SCHEDULE = 2;
+    // Type of GThread donate to there's scheduleLinked is existed.
     protected static final int G_THREAD_WITH_LINKED_SCHEDULE = 3;
     
     private ScheduleGThread mScheduleGThread;
     private ScheduleGThreadLinked mScheduleGThreadLinked;
     private GThread mGThread;
-    
+    /**
+     * Called when gthreads which connected to container is finished.
+     * This method notify container about the finishing.
+     */
     protected void notifyChanging(){
         if(mScheduleGThread != null){
             mScheduleGThread.onItemFinished();
@@ -36,16 +41,29 @@ abstract class GThreadController{
             mScheduleGThreadLinked.onItemFinished(mGThread);
         }
     }
-    
+    /**
+     * Set schedule for gthread to can notify when gthread progress is
+     * finished completely.
+     * @param scheduleGThread   Schedule container which is going to set
+     *                          as gthread schedule
+     */
     protected void setScheduleGThread(ScheduleGThread scheduleGThread){
         mScheduleGThread = scheduleGThread;
     }
-    
+    /**
+     * Set schedule linked for gthread to can notify when gthread progress is
+     * finished completely.
+     * @param scheduleGThread   Schedule linked container which is going to set
+     *                          as gthread schedule
+     */
     protected void setScheduleGThreadLinked(ScheduleGThreadLinked scheduleGThreadLinked, GThread gThread){
         mScheduleGThreadLinked = scheduleGThreadLinked;
         mGThread = gThread;
     }
-   
+   /**
+    * Check the type of gthread if it's existing with Schedule/ScheduleLinked
+    * or not. 
+    */
     protected int getGthreadType(){
         if(mScheduleGThread != null)
             return G_THREAD_WITH_SCHEDULE;
