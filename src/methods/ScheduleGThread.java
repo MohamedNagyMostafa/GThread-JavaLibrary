@@ -67,7 +67,12 @@ public abstract class ScheduleGThread extends GShedule{
                 gThread.start();
                 
                 updateWorkers(INCREASE_ONE_WORKER_FROM_WORKERS);
-                while(mCurrentWorker >= M_WORKERS_LIMIT);
+                System.out.println("increase workers");
+                while(mCurrentWorker >= M_WORKERS_LIMIT){ /// To aviod Java bug.
+                    if(mCurrentWorker >= M_WORKERS_LIMIT)
+                        break;
+                }
+                System.out.println("new item");
             }
             
             allTasksExceuted();
@@ -80,6 +85,7 @@ public abstract class ScheduleGThread extends GShedule{
      * Called when each one of tasks is terminated.
      */
     void onItemFinished(){
+        System.out.println("start decrease");
         updateWorkers(DECREASE_ONE_WORKER_FROM_WORKERS);        
     }
     /**
