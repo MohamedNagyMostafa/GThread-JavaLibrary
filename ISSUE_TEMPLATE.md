@@ -1,1 +1,1 @@
-<p> Ensure that you are used the last version of GThread.</p>
+***Ensure that you are used the last version of GThread.***
